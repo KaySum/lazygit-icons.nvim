@@ -8,26 +8,33 @@ local function set_highlights()
   end
 end
 
--- lazygit picks by exact file name, then by the lowercased text after the last dot.
-local function lazygit_icon(name)
-  return icons.file[name] or icons.extension[(name:match("%.([^.]*)$") or ""):lower()]
+local function pick(tbl, keys)
+  local picked = {}
+  for _, key in ipairs(keys or {}) do
+    picked[key] = tbl[key]
+  end
+  return picked
 end
 
 --- Call after mini.icons' own setup(): its config is extended, not replaced.
-function M.setup()
+---@param opts? { only?: { file?: string[], extension?: string[] } } `only` limits the override to the listed names
+function M.setup(opts)
   local ok, mini_icons = pcall(require, "mini.icons")
   if not ok then
     vim.notify("[lazygit-icons] requires nvim-mini/mini.icons", vim.log.levels.ERROR)
     return
   end
 
-  -- mini.icons checks file names (built-in and configured) before extensions; lazygit doesn't
-  -- know those names and would pick by extension, so pin them to that icon.
-  local file = vim.tbl_extend("force", {}, icons.file)
+  local only = opts and opts.only
+  local extension = only and pick(icons.extension, only.extension) or icons.extension
+  local file = only and pick(icons.file, only.file) or vim.tbl_extend("force", {}, icons.file)
+
+  -- lazygit picks by exact file name, then by the lowercased text after the last dot. mini.icons
+  -- checks its own file names (built-in and configured) first, so pin those to lazygit's pick.
   for _, name in ipairs(mini_icons.list("file")) do
-    file[name] = lazygit_icon(name)
+    file[name] = file[name] or extension[(name:match("%.([^.]*)$") or ""):lower()]
   end
-  mini_icons.setup(vim.tbl_deep_extend("force", mini_icons.config, { file = file, extension = icons.extension }))
+  mini_icons.setup(vim.tbl_deep_extend("force", mini_icons.config, { file = file, extension = extension }))
 
   set_highlights()
   -- Colorschemes clear highlights on load, so re-apply after each one.

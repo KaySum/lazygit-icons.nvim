@@ -18,7 +18,22 @@ lazy.nvim:
 Anything else: call `require('lazygit-icons').setup()` after mini.icons' own
 `setup()`. Its config is extended, not replaced.
 
-There is nothing to configure.
+## Overriding only some icons
+
+By default every icon lazygit knows is overridden. Pass `only` to override just
+the listed file names and extensions and leave everything else to mini.icons:
+
+```lua
+opts = {
+  only = {
+    file = { 'Makefile', '.gitignore' },
+    extension = { 'lua', 'tsx' }, -- lowercase, no leading dot
+  },
+}
+```
+
+A list you leave out overrides nothing of that kind. Names lazygit has no icon
+for are ignored.
 
 ## What matches lazygit
 
