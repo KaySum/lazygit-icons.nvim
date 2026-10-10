@@ -42,6 +42,29 @@ opts = {
 }
 ```
 
+## Leaving some icons alone
+
+`except` is the reverse: everything is overridden apart from the listed file
+names and extensions, which keep the icon and color mini.icons gives them.
+
+```lua
+opts = { except = { 'Makefile', 'init.lua', '*.tsx' } }
+```
+
+A keyed entry leaves just that part alone:
+
+```lua
+opts = {
+  except = {
+    'Makefile',          -- mini.icons' icon and color
+    ['*.lua'] = 'icon',  -- mini.icons' icon, lazygit's color
+    ['*.tsx'] = 'color', -- mini.icons' color, lazygit's icon
+  },
+}
+```
+
+It can be combined with `only`, and wins where the two overlap.
+
 ## What matches lazygit
 
 A file gets the icon lazygit would give it: by exact file name first, then by
