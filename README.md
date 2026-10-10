@@ -30,6 +30,18 @@ opts = { only = { 'Makefile', '.gitignore', '*.lua', '*.tsx' } }
 `*.ext` is an extension; anything else is an exact file name. Entries lazygit
 has no icon for are ignored.
 
+To take only lazygit's icon or only its color for an entry, write it as a key:
+
+```lua
+opts = {
+  only = {
+    'Makefile',          -- icon and color
+    ['*.lua'] = 'icon',  -- lazygit's icon, mini.icons' color
+    ['*.tsx'] = 'color', -- lazygit's color, mini.icons' icon
+  },
+}
+```
+
 ## What matches lazygit
 
 A file gets the icon lazygit would give it: by exact file name first, then by

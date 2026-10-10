@@ -8,22 +8,36 @@ local function set_highlights()
   end
 end
 
--- Entries are exact file names, or `*.ext` for an extension.
+local function part_of(icon, part)
+  if part == "icon" then
+    return { glyph = icon.glyph }
+  end
+  if part == "color" then
+    return { hl = icon.hl }
+  end
+  return icon
+end
+
+-- Entries are exact file names, or `*.ext` for an extension. A keyed entry names the part to override.
 local function pick(patterns)
   local file, extension = {}, {}
-  for _, pattern in ipairs(patterns) do
-    local ext = pattern:lower():match("^%*%.(.+)$")
-    if ext then
-      extension[ext] = icons.extension[ext]
-    else
-      file[pattern] = icons.file[pattern]
+  for key, value in pairs(patterns) do
+    local pattern, part = value, nil
+    if type(key) == "string" then
+      pattern, part = key, value
     end
+    local ext = pattern:lower():match("^%*%.(.+)$")
+    local from, to, name = icons.file, file, pattern
+    if ext then
+      from, to, name = icons.extension, extension, ext
+    end
+    to[name] = from[name] and part_of(from[name], part)
   end
   return file, extension
 end
 
 --- Call after mini.icons' own setup(): its config is extended, not replaced.
----@param opts? { only?: string[] } `only` limits the override to the listed file names and `*.ext` extensions
+---@param opts? { only?: table<integer|string, string> } `only` limits the override to the listed file names and `*.ext` extensions
 function M.setup(opts)
   local ok, mini_icons = pcall(require, "mini.icons")
   if not ok then
