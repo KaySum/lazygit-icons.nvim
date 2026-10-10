@@ -24,16 +24,11 @@ By default every icon lazygit knows is overridden. Pass `only` to override just
 the listed file names and extensions and leave everything else to mini.icons:
 
 ```lua
-opts = {
-  only = {
-    file = { 'Makefile', '.gitignore' },
-    extension = { 'lua', 'tsx' }, -- lowercase, no leading dot
-  },
-}
+opts = { only = { 'Makefile', '.gitignore', '*.lua', '*.tsx' } }
 ```
 
-A list you leave out overrides nothing of that kind. Names lazygit has no icon
-for are ignored.
+`*.ext` is an extension; anything else is an exact file name. Entries lazygit
+has no icon for are ignored.
 
 ## What matches lazygit
 

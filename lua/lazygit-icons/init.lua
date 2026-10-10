@@ -8,16 +8,22 @@ local function set_highlights()
   end
 end
 
-local function pick(tbl, keys)
-  local picked = {}
-  for _, key in ipairs(keys or {}) do
-    picked[key] = tbl[key]
+-- Entries are exact file names, or `*.ext` for an extension.
+local function pick(patterns)
+  local file, extension = {}, {}
+  for _, pattern in ipairs(patterns) do
+    local ext = pattern:lower():match("^%*%.(.+)$")
+    if ext then
+      extension[ext] = icons.extension[ext]
+    else
+      file[pattern] = icons.file[pattern]
+    end
   end
-  return picked
+  return file, extension
 end
 
 --- Call after mini.icons' own setup(): its config is extended, not replaced.
----@param opts? { only?: { file?: string[], extension?: string[] } } `only` limits the override to the listed names
+---@param opts? { only?: string[] } `only` limits the override to the listed file names and `*.ext` extensions
 function M.setup(opts)
   local ok, mini_icons = pcall(require, "mini.icons")
   if not ok then
@@ -25,9 +31,10 @@ function M.setup(opts)
     return
   end
 
-  local only = opts and opts.only
-  local extension = only and pick(icons.extension, only.extension) or icons.extension
-  local file = only and pick(icons.file, only.file) or vim.tbl_extend("force", {}, icons.file)
+  local file, extension = vim.tbl_extend("force", {}, icons.file), icons.extension
+  if opts and opts.only then
+    file, extension = pick(opts.only)
+  end
 
   -- lazygit picks by exact file name, then by the lowercased text after the last dot. mini.icons
   -- checks its own file names (built-in and configured) first, so pin those to lazygit's pick.
